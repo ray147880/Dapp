@@ -117,8 +117,8 @@ contract testAMZNToken is ERC20Interface, Owned {
         //balances[from] = balances[from].sub(tokens);
         //allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         //balances[to] = balances[to].add(tokens);
-        require(tokens<=balances[from]);
-        require(tokens<=allowed[from][msg.sender]);
+        //require(tokens<=balances[from]);
+        //require(tokens<=allowed[from][msg.sender]);
         
         balances[from] = balances[from] - tokens;
         allowed[from][msg.sender] = allowed[from][msg.sender]- tokens;
