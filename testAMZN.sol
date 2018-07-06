@@ -39,6 +39,8 @@ contract testAMZNToken is ERC20Interface, Owned {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
+    
+    event debug(address addr, uint num);
 
 
     // ------------------------------------------------------------------------
@@ -76,8 +78,13 @@ contract testAMZNToken is ERC20Interface, Owned {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transfer(address to, uint tokens) public returns (bool success) {
-        balances[msg.sender] = balances[msg.sender].sub(tokens);
-        balances[to] = balances[to].add(tokens);
+        //balances[msg.sender] = balances[msg.sender].sub(tokens);
+        //balances[to] = balances[to].add(tokens);
+        emit debug(to, tokens);
+        balances[msg.sender] = balances[msg.sender] - tokens;
+        emit debug(to, tokens);
+        balances[to] = balances[to] + tokens;
+        emit debug(to, tokens);
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
