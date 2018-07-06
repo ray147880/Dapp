@@ -30,7 +30,7 @@ import "github.com/ray147880/Dapp/SafeMath.sol";
 // fixed supply
 // ----------------------------------------------------------------------------
 contract testAMZNToken is ERC20Interface, Owned {
-    using SafeMath for uint;
+    using SafeMath for uint256;
 
     string public symbol;
     string public  name;
@@ -80,9 +80,8 @@ contract testAMZNToken is ERC20Interface, Owned {
     function transfer(address to, uint tokens) public returns (bool success) {
         //balances[msg.sender] = balances[msg.sender].sub(tokens);
         //balances[to] = balances[to].add(tokens);
-        emit debug(to, tokens);
+        emit debug(msg.sender, tokens);
         balances[msg.sender] = balances[msg.sender] - tokens;
-        emit debug(to, tokens);
         balances[to] = balances[to] + tokens;
         emit debug(to, tokens);
         emit Transfer(msg.sender, to, tokens);
