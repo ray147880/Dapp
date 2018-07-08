@@ -1,39 +1,57 @@
-pragma solidity ^0.4.24;
+/*
+   Option Creation. i.e. Sell side
+*/
 
-contract Owned{
-    address owner;
-    
-    function Owned() public{
-        owner = msg.sender;
-    }
-    
-    modifier onlyOwner{
-        require(msg.sender == owner); //require = if
-        _;
-    }
-}
 
-contract OptionCreator is Owned{
-    struct Option{
-        string contractName;
-        string underlying;
-        uint strikePrice;
-        uint expiration;
-    }
+import "github.com/ray147880/Dapp/testAMZN.sol";
+
+
+contract OptionCreator{
+    address public creatorAddr;
+    string public contractName;
+    string public underlying;
+    uint public strikePrice;
+    uint public expiration;
     
-    mapping (address => Option) options;
+    uint public AMZNprice;
+    address public testAMZN_TOKEN_ADDRESS;
+    testAMZNToken testAMZN_TOKEN;
+    
+    constructor(
+        address _creatorAddr,
+        string _contractName,
+        string _underlying,
+        uint _strikePrice,
+        uint _expiration
+        )public{
+            creatorAddr = _creatorAddr;
+            contractName = _contractName;
+            underlying = _underlying;
+            strikePrice = _strikePrice;
+            expiration = _expiration;
+            testAMZN_TOKEN_ADDRESS = 0xE8B5425f8DF49aC39b4c1f771c24b25B1176D117;
+            testAMZN_TOKEN = testAMZNToken(testAMZN_TOKEN_ADDRESS);
+        }
+    
+    //mapping (address => Option) public options;
     address[] public OptionAccts;
     
     event optionInfo(string contractName, string underlying, uint strikePrice, uint expiration);
+    event logAmazonTicker(uint AMZNprice);
+    event settlement(uint strikePrice, string descritionS);
+    event notsettlement(uint strikePrice, string descritionNS);
+    event balanceEvent(uint balance);
+    event noBalance(address sender, uint bal, string description);
         
     
-    function setOption(address _address, string _contractName, string _underlying, uint _strikePrice, uint _expiration) onlyOwner public{
-        var option = options[_address];
+    function setOption(address _address, string _contractName, string _underlying, uint _strikePrice, uint _expiration) public{
+        //var option = options[_address];
         
-        option.contractName = _contractName;
-        option.underlying = _underlying;
-        option.strikePrice = _strikePrice;
-        option.expiration = _expiration;
+        creatorAddr = _address;
+        contractName = _contractName;
+        underlying = _underlying;
+        strikePrice = _strikePrice;
+        expiration = _expiration;
         
         
         OptionAccts.push(_address);
@@ -45,10 +63,33 @@ contract OptionCreator is Owned{
     }
     
     function getOption(address _address) view public returns (string, string, uint, uint){
-        return(options[_address].contractName, options[_address].underlying, options[_address].strikePrice, options[_address].expiration);
+        return(contractName, underlying, strikePrice, expiration);
     }
     
     function countOptions() view public returns (uint){
         return OptionAccts.length;
     }
+    
+    function checkSettlement() internal{
+        if (AMZNprice > strikePrice){
+
+            uint balance = testAMZN_TOKEN.balanceOf(0x4a937e8388ee86953b13e0770e7be4fc6fad1775);
+            uint sendAmount = 10;
+            if(balance > (sendAmount*(10**18))){
+                sendTokens(0x4a937e8388ee86953b13e0770e7be4fc6fad1775, creatorAddr, sendAmount);
+                emit settlement(strikePrice, "Settled: Tokens sent");
+            }
+            else{
+                emit noBalance(0x4a937e8388ee86953b13e0770e7be4fc6fad1775, balance, "Not enough tokens balance to settle");
+            }
+        }
+        else{
+            emit notsettlement(strikePrice, "Not Settled: LastPrice < StrikePrice");
+        }
+    }
+    
+    function sendTokens(address fm, address to, uint amount) public{
+        testAMZN_TOKEN.transferFrom(fm,to,amount*(10**18));
+    }
+        
 }
