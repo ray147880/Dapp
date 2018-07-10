@@ -1,9 +1,10 @@
+pragma solidity ^0.4.24;
 /*
    Option Creation. i.e. Sell side
 */
 
 
-import "github.com/ray147880/Dapp/testAMZN.sol";
+import "./testAMZN.sol";
 
 
 contract OptionCreator{
