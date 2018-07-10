@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
-import "github.com/ray147880/Dapp/ERC20Interface.sol";
-import "github.com/ray147880/Dapp/Owned.sol";
-import "github.com/ray147880/Dapp/SafeMath.sol";
+import "./ERC20Interface.sol";
+import "./Owned.sol";
+import "./SafeMath.sol";
 
 // ----------------------------------------------------------------------------
 // 'FIXED' 'Example Fixed Supply Token' token contract
