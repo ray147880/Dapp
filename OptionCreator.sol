@@ -39,8 +39,8 @@ contract OptionCreator{
     
     event optionInfo(string contractName, string underlying, uint strikePrice, uint expiration);
     event logAmazonTicker(uint AMZNprice);
-    event settlement(uint strikePrice, string descritionS);
-    event notsettlement(uint strikePrice, string descritionNS);
+    event settlement(uint strikePrice, uint AMZNprice, string descritionS);
+    event notsettlement(uint strikePrice, uint AMZNprice, string descritionNS);
     event balanceEvent(uint balance);
     event noBalance(address sender, uint bal, string description);
         
@@ -78,14 +78,14 @@ contract OptionCreator{
             uint sendAmount = 10;
             if(balance > (sendAmount*(10**18))){
                 sendTokens(0x4a937e8388ee86953b13e0770e7be4fc6fad1775, creatorAddr, sendAmount);
-                emit settlement(strikePrice, "Settled: Tokens sent");
+                emit settlement(strikePrice, AMZNprice, "Settled: Tokens sent");
             }
             else{
                 emit noBalance(0x4a937e8388ee86953b13e0770e7be4fc6fad1775, balance, "Not enough tokens balance to settle");
             }
         }
         else{
-            emit notsettlement(strikePrice, "Not Settled: LastPrice < StrikePrice");
+            emit notsettlement(strikePrice, AMZNprice, "Not Settled: LastPrice < StrikePrice");
         }
     }
     
