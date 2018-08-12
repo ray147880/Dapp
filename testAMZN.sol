@@ -21,9 +21,9 @@ import "./SafeMath.sol";
 //
 // Borrowed from MiniMeToken
 // ----------------------------------------------------------------------------
-//contract ApproveAndCallFallBack {
-//    function receiveApproval(address from, uint256 tokens, address token, bytes data) public;
-//}
+contract ApproveAndCallFallBack {
+    function receiveApproval(address from, uint256 tokens, address token, bytes data) public;
+}
 
 // ----------------------------------------------------------------------------
 // ERC20 Token, with the addition of symbol, name and decimals and a
@@ -117,12 +117,13 @@ contract testAMZNToken is ERC20Interface, Owned {
         //balances[from] = balances[from].sub(tokens);
         //allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         //balances[to] = balances[to].add(tokens);
-        //require(tokens<=balances[from]);
-        //require(tokens<=allowed[from][msg.sender]);
+        
         
         balances[from] = balances[from] - tokens;
         allowed[from][msg.sender] = allowed[from][msg.sender]- tokens;
         balances[to] = balances[to] + tokens;
+        require(tokens<=balances[from]);
+        require(tokens<=allowed[from][msg.sender]);
         emit Transfer(from, to, tokens);
         return true;
     }
@@ -142,12 +143,12 @@ contract testAMZNToken is ERC20Interface, Owned {
     // from the token owner's account. The `spender` contract function
     // `receiveApproval(...)` is then executed
     // ------------------------------------------------------------------------
-    /*function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
+    function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
-    }*/
+    }
 
 
     // ------------------------------------------------------------------------
