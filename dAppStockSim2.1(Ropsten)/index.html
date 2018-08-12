@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>dAppStockSim2.1</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <h1>Onchain Option Creation</h1>
+        <span id="countOpt"></span>
+
+        <h2 id="option"></h2>
+		<span id="optTrans"></span>
+		<span id="settle"></span>
+        <hr>
+
+        <img id="loader" src="https://loading.io/spinners/camera/index.camera-aperture-ajax-spinner.gif">
+
+        <label for="contractName" class="label1">Option Contract Name</label>
+        <input id="contractName" type="text">
+
+        <label for="underlying" class="label1">Underlying Code</label>
+        <input id="underlying" type="text">
+
+        <label for="strikePrice" class="label1">Strike Price</label>
+		<input id="strikePrice" type="text">
+		
+		<label for="expiration" class="label1">Expiration</label>
+        <input id="expiration" type="text">
+
+		<button id="createButton">Create Option</button>
+		<button id="buyButton">Buy</button>
+
+    </div>
+
+    <div class="container">
+
+        <h1>Offchain Option Creation</h1>
+        <span id="countOpt2"></span>
+
+        <h2 id="option2"></h2>
+		<span id="optTrans2"></span>
+		<span id="settle2"></span>
+        <hr>
+
+        <img id="loader2" src="https://loading.io/spinners/camera/index.camera-aperture-ajax-spinner.gif">
+
+        <label for="contractName2" class="label2">Option Contract Name</label>
+        <input id="contractName2" type="text">
+
+        <label for="underlying2" class="label2">Underlying Code</label>
+        <input id="underlying2" type="text">
+
+        <label for="strikePrice2" class="label2">Strike Price</label>
+		<input id="strikePrice2" type="text">
+		
+		<label for="expiration2" class="label2">Expiration</label>
+        <input id="expiration2" type="text">
+
+		<button id="createButton2">Create Option</button>
+		<button id="buyButton2">Buy</button>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+        // v2.0 -- An updated version that use Factory to increase the reusability of the smart contract
+        $("#buyButton").hide();
+        $("#buyButton2").hide();
+
+		// detect the context of browser e.g. meta mask / mist / others
+		if(typeof web3 !== 'undefined'){
+		web3 = new Web3(web3.currentProvider);
+		}
+		else{
+			web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+		}
+
+		web3.eth.defaultAccount = web3.eth.accounts[0];
+	
+	    // abi for smart contracts
+        var OnChainOptionFactory = web3.eth.contract([ { "constant": true, "inputs": [], "name": "seller", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_contractName", "type": "string" }, { "name": "_underlying", "type": "string" }, { "name": "_strikePrice", "type": "uint256" }, { "name": "_expiration", "type": "uint256" } ], "name": "setOnChainOraclize", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "contractAddress", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "inputs": [], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "contractAddr", "type": "address" } ], "name": "debug", "type": "event" } ]);
+        var OffChainOptionFactory = web3.eth.contract([ { "constant": true, "inputs": [], "name": "seller", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_contractName", "type": "string" }, { "name": "_underlying", "type": "string" }, { "name": "_strikePrice", "type": "uint256" }, { "name": "_expiration", "type": "uint256" }, { "name": "_buyer", "type": "address" }, { "name": "_seller", "type": "address" } ], "name": "setOffChainOraclize", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "contractAddress", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "inputs": [], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "contractAddr", "type": "address" } ], "name": "debug", "type": "event" } ]);
+		var OptionOraclize = web3.eth.contract([ { "constant": false, "inputs": [ { "name": "to", "type": "address" }, { "name": "amount", "type": "uint256" } ], "name": "sendTokens", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "seller", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "contractAddr", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "creatorAddr", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "myid", "type": "bytes32" }, { "name": "result", "type": "string" } ], "name": "__callback", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "_address", "type": "address" } ], "name": "getOption", "outputs": [ { "name": "", "type": "string" }, { "name": "", "type": "string" }, { "name": "", "type": "uint256" }, { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_creatorAddr", "type": "address" }, { "name": "_contractName", "type": "string" }, { "name": "_underlying", "type": "string" }, { "name": "_strikePrice", "type": "uint256" }, { "name": "_expiration", "type": "uint256" } ], "name": "onChainCreator", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "myid", "type": "bytes32" }, { "name": "result", "type": "string" }, { "name": "proof", "type": "bytes" } ], "name": "__callback", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "testAMZN_TOKEN_ADDRESS", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_address", "type": "address" }, { "name": "_contractName", "type": "string" }, { "name": "_underlying", "type": "string" }, { "name": "_strikePrice", "type": "uint256" }, { "name": "_expiration", "type": "uint256" } ], "name": "setOption", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "expiration", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "buyOption", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "underlying", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "buyer", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "contractName", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_contractName", "type": "string" }, { "name": "_underlying", "type": "string" }, { "name": "_strikePrice", "type": "uint256" }, { "name": "_expiration", "type": "uint256" }, { "name": "_buyer", "type": "address" }, { "name": "_seller", "type": "address" } ], "name": "offChainCreator", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "getOption", "outputs": [ { "name": "", "type": "address[]" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "countOptions", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "update", "outputs": [], "payable": true, "stateMutability": "payable", "type": "function" }, { "constant": false, "inputs": [ { "name": "fm", "type": "address" }, { "name": "to", "type": "address" }, { "name": "amount", "type": "uint256" } ], "name": "sendTokensFrom", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "AMZNprice", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "strikePrice", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_contractName", "type": "string" }, { "name": "_underlying", "type": "string" }, { "name": "_strikePrice", "type": "uint256" }, { "name": "_expiration", "type": "uint256" } ], "name": "setOptionCreator", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "spender", "type": "address" }, { "name": "amount", "type": "uint256" } ], "name": "approveTokens", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "uint256" } ], "name": "OptionAccts", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "inputs": [ { "name": "creatorAddr", "type": "address" }, { "name": "contractName", "type": "string" }, { "name": "underlying", "type": "string" }, { "name": "strikePrice", "type": "uint256" }, { "name": "expiration", "type": "uint256" } ], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "description", "type": "string" } ], "name": "logOraclizeQuery", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "description2", "type": "string" } ], "name": "logExercise", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "buyer", "type": "address" } ], "name": "buyOptionfuncDebug", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "creator", "type": "address" } ], "name": "newOptionDebug", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "contractName", "type": "string" }, { "indexed": false, "name": "underlying", "type": "string" }, { "indexed": false, "name": "strikePrice", "type": "uint256" }, { "indexed": false, "name": "expiration", "type": "uint256" } ], "name": "optionInfo", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "AMZNprice", "type": "uint256" } ], "name": "logAmazonTicker", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "strikePrice", "type": "uint256" }, { "indexed": false, "name": "AMZNprice", "type": "uint256" }, { "indexed": false, "name": "descritionS", "type": "string" } ], "name": "settlement", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "strikePrice", "type": "uint256" }, { "indexed": false, "name": "AMZNprice", "type": "uint256" }, { "indexed": false, "name": "descritionNS", "type": "string" } ], "name": "notsettlement", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "balance", "type": "uint256" } ], "name": "balanceEvent", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "sender", "type": "address" }, { "indexed": false, "name": "bal", "type": "uint256" }, { "indexed": false, "name": "description", "type": "string" } ], "name": "noBalance", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "contractAddr", "type": "address" }, { "indexed": false, "name": "buyer", "type": "address" }, { "indexed": false, "name": "seller", "type": "address" } ], "name": "debug2", "type": "event" } ]);
+
+        
+        
+        // Load the contract at the address into the variables
+        var OnFactory = OnChainOptionFactory.at('0x01a75316c3a561c699e56cdce4dbbce07f2ca737');
+        var OffFactory = OffChainOptionFactory.at('0x850285471e3c57836d9cc57a0fe9a9f3dd48139b');
+
+
+        // Variables declaration for events
+        var optionEvent = OnFactory.debug({}, 'latest');
+        var optionEvent2 = OffFactory.debug({}, 'latest');
+        
+        
+        var OraclizeAddressOn;
+        var OraclizeAddressOff;
+
+        var OptionOracOn;
+        var OptionOracOff;
+ 
+        var optionInfo2;
+        var optionNotSettleEvent;
+        var optionSettleEvent;
+
+        var optionInfo2;
+        var optionNotSettleEvent2;
+        var optionSettleEvent2;
+        
+        // Declare trading variables
+        var offContractName = [];
+        var offUnderlying = [];
+        var offStrikePrice = [];
+        var offExpiration = [];
+        var offBuyer = [];
+        var offSeller = [];
+
+        // Click button for On Chain option contract creation
+        $("#createButton").click(function() {
+            $("#loader").show();
+            $("#createButton").hide();
+
+            // Call the function in the On chain factory smart contract to create a new Oraclize contract
+            OnFactory.setOnChainOraclize($("#contractName").val(), $("#underlying").val(), $("#strikePrice").val(), $("#expiration").val(), (err, res) => {
+                if (err) {
+                    console.log("ERROR");
+                }
+            });           
+        });
+
+        // Click button for Off Chain option contract creation
+        $("#createButton2").click(function() {
+            
+            $("#loader2").show();
+            $("#createButton2").hide();
+
+            // Setting user inputs into variables
+            offContractName[0] = $("#contractName2").val();
+            offUnderlying[0] = $("#underlying2").val();
+            offStrikePrice[0] = $("#strikePrice2").val();
+            offExpiration[0] = $("#expiration2").val();
+
+            // Setting MetaMask account
+            offSeller[0] = web3.eth.defaultAccount;
+
+            $("#loader2").hide();
+            $("#buyButton2").show();
+
+            
+            $("#contractName2").hide();
+            $("#underlying2").hide();
+            $("#strikePrice2").hide();
+            $("#expiration2").hide();
+            $(".label2").hide();
+            
+            // Displaying the details of the contract
+            $("#optTrans2").html('Created');
+            $("#option2").html(offContractName[0] + ' ' + offUnderlying[0] + '@' + offStrikePrice[0] + ', ' + offExpiration[0] + ' Seller: ' + offSeller[0]);
+       });
+
+       // Buy button for Off Chain option contract matching
+       $("#buyButton2").click(function() {
+            $("#loader2").show();
+            offBuyer[0] = web3.eth.defaultAccount;
+            $("#loader2").hide();
+
+            // Displaying the details of the contract
+            $("#optTrans2").html('Matched');
+            $("#option2").html(offContractName[0] + ' ' + offUnderlying[0] + '@' + offStrikePrice[0] + ', ' + offExpiration[0] + ' Seller: ' + offSeller[0] + ' Buyer: ' + offBuyer[0]);
+
+            $("#loader2").show();
+
+            $("#buyButton2").hide();
+
+            // Call the function in the Off chain factory smart contract to create a new Oraclize contract
+            OffFactory.setOffChainOraclize(offContractName[0], offUnderlying[0], offStrikePrice[0], offExpiration[0], offBuyer[0], offSeller[0], (err, res) => {
+                if (err) {
+                    console.log("ERROR");
+                }
+            });
+        });
+        
+        // On chain factory contract event to get the newly created Oraclize contract address
+        optionEvent.watch(function(error, result) {
+            if (result) {
+               if (result.blockHash != $("#optTrans").html()){
+                    $("#buyButton").show();
+
+                    $("#loader").hide();
+                    $("#createButton").hide();
+                    $("#contractName").hide();
+                    $("#underlying").hide();
+                    $("#strikePrice").hide();
+                    $("#expiration").hide();
+                    $(".label1").hide();
+                }                    
+                $("#optTrans").html('Factory Address: ' + result.address + ' Oracle Address: ' + result.args.contractAddr);
+
+                // Get the On chain Oraclize contract address
+                OraclizeAddressOn = result.args.contractAddr;
+                
+                // Interacting with the On chain Oraclize contract
+                OptionOracOn = OptionOraclize.at(OraclizeAddressOn);
+                optionNotSettleEvent = OptionOracOn.notsettlement({}, 'latest');
+                optionSettleEvent = OptionOracOn.settlement({}, 'latest');
+                optionInfo = OptionOracOn.optionInfo({}, 'latest');
+                
+                // Oraclize contract event to get the details of the option contract
+                optionInfo.watch(function(error, result) {
+                        if (result) {
+                            if (result.blockHash != $("#optTrans").html()){
+                                $("#buyButton").show();
+
+                                $("#loader").hide();
+                                $("#createButton").hide();
+                                $("#contractName").hide();
+                                $("#underlying").hide();
+                                $("#strikePrice").hide();
+                                $("#expiration").hide();
+                                $(".label1").hide();
+                            }
+                                    
+                            $("#option").html(result.args.contractName + ' ' + result.args.underlying + '@' + result.args.strikePrice + ', ' + result.args.expiration);
+                        } 
+                        else {
+                            console.log("ERROR");
+                        }
+                    });
+                
+                // Oraclize contract event that is triggered when the option contract is not exercised
+                optionNotSettleEvent.watch(function(error, result){
+                    if(result){
+                        $("#loader").show();
+                        $("#settle").html('StrikePrice: ' + result.args.strikePrice + ' ' + 'LastPrice: ' + result.args.AMZNprice + ' ' + result.args.descritionNS);
+                        $("#buyButton").hide();
+                        $("#loader").hide();
+                    }
+                });
+                
+                // Oraclize contract event that is triggered when the option contract is exercised
+                optionSettleEvent.watch(function(error, result){
+                    if(result){
+                        $("#loader").show();
+                        $("#settle").html('StrikePrice: ' + result.args.strikePrice + ' ' + 'LastPrice: ' + result.args.AMZNprice + ' ' + result.args.descritionS);
+                        $("#buyButton").hide();
+                        $("#loader").hide();
+                    }
+                });                
+
+
+                // Buy button for On Chain option contract matching
+                $("#buyButton").click(function() {
+                    $("#loader").show();
+                    $("#buyButton").hide();
+
+                    // Call the function in the On chain Oraclize smart contract to match the order
+                    OptionOracOn.buyOption((err, res) => {
+                        if (res)
+                            console.log("DONE");
+                            
+                    });
+                });
+            } 
+            else {
+                console.log("ERROR");
+            }
+        });
+
+       // Off Chain Factory contract event to get the newly created Oraclize contract address
+       optionEvent2.watch(function(error, result) {
+           if (result) {
+                if (result.blockHash != $("#optTrans2").html()){
+                    $("#createButton2").hide();
+                        $("#contractName2").hide();
+                        $("#underlying2").hide();
+                        $("#strikePrice2").hide();
+                        $("#expiration2").hide();
+                        $(".label2").hide();
+                }
+   
+                $("#optTrans2").html('Factory Address: ' + result.address + ' Oracle Address: ' + result.args.contractAddr);
+            
+                // Get the Off chain Oraclize contract address
+                OraclizeAddressOff = result.args.contractAddr;
+
+                // Interacting with the On chain Oraclize contract
+                OptionOracOff = OptionOraclize.at(OraclizeAddressOff);
+                optionNotSettleEvent2 = OptionOracOff.notsettlement({}, 'latest');
+                optionSettleEvent2 = OptionOracOff.settlement({}, 'latest');
+                optionInfo2 = OptionOracOff.optionInfo({}, 'latest');
+                
+                // Oraclize contract event to get the details of the option contract
+                optionInfo2.watch(function(error, result) {
+                    if (result) {
+                        if (result.blockHash != $("#optTrans2").html()){
+                            $("#createButton2").hide();
+                            $("#contractName2").hide();
+                            $("#underlying2").hide();
+                            $("#strikePrice2").hide();
+                            $("#expiration2").hide();
+                            $(".label2").hide();
+                        }
+                                
+                        $("#option2").html(result.args.contractName + ' ' + result.args.underlying + '@' + result.args.strikePrice + ', ' + result.args.expiration);
+                    } 
+                    else {
+                        console.log("ERROR");
+                    }
+                });
+
+                // Oraclize contract event that is triggered when the option contract is not exercised
+                optionNotSettleEvent2.watch(function(error, result){
+                    if(result){
+                        $("#loader2").show();
+                        $("#settle2").html('StrikePrice: ' + result.args.strikePrice + ' ' + 'LastPrice: ' + result.args.AMZNprice + ' ' + result.args.descritionNS);
+                        $("#buyButton2").hide();
+                        $("#loader2").hide();
+                    }
+                });
+
+                // Oraclize contract event that is triggered when the option contract is exercised
+                optionSettleEvent2.watch(function(error, result){
+                    if(result){
+                        $("#loader2").show();
+                        $("#settle2").html('StrikePrice: ' + result.args.strikePrice + ' ' + 'LastPrice: ' + result.args.AMZNprice + ' ' + result.args.descritionS);
+                        $("#buyButton2").hide();
+                        $("#loader2").hide();
+                    }
+                });
+            } 
+            else {
+                console.log("ERROR");
+            }   
+       });
+       
+    </script>
+</body>
+</html>

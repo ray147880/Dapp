@@ -1,0 +1,28 @@
+body {
+    padding: 0.8em;
+    background-color:#F0F0F0;
+    font-family: 'Arial';
+}
+
+#option {
+    padding:0.8em;
+    background-color:#fff;
+    margin: 1em 0;
+}
+
+#option2 {
+    padding:0.8em;
+    background-color:#fff;
+    margin: 1em 0;
+}
+
+#loader {
+    width: 40px;
+    display:none;
+}
+
+#loader2 {
+    width: 40px;
+    display:none;
+}
+
