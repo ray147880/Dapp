@@ -1,14 +1,16 @@
 v1.0  - Create Oraclize, Create Option, Buy Option, Oraclize Settlement, Tokens transfer, Tokens locking, OffChain
 v2.0  - Add Onchain and Offchain Factories
-v2.1  - Use transfer instead of transferFrom in settlement. Have Both Rinkeby and Ropsten version of web interface 
+v2.2  --  Final Version: Remove all unwanted and debug code
+
+The Solidity Contracts are inside the dAppStockSim2.2(Rinkeby) and dAppStockSim2.2(Ropsten)folders.
 
 
 Rinkeby:
-Testing Tokens address: 0x6C663412959A18D779a2F7A08eEF0F16677e736b
-OnChain Factory address: 0x265aa3c4038ea76ee5efbf7a924d91c7b3d315c5
-OffChain Factory address: 0x1de52a3d36be72c6332d07b23169e914db0a5a66
+Testing Tokens address: 0x1d3907b4674f1aeb51c079a5ce42cabda160077a
+On-Chain Factory address: 0xb9243e672ad2d1c8ae86a0c339868f384e6bff14
+Off-Chain Factory address: 0xc7c44da00f4d9188dbf514035f378ae7d5a34496
 
 Ropsten:
-Testing Tokens address: 0x8a4624E6576f7857698812809B566A86A9fB22B8
-OnChain Factory address: 0x01a75316c3a561c699e56cdce4dbbce07f2ca737
-OffChain Factory address: 0x850285471e3c57836d9cc57a0fe9a9f3dd48139b
+Testing Tokens address: 0x8fa7ac50c862f5959f6e681a2dedf5bbeee5fbfa
+On-Chain Factory address: 0xae08f3ab95a84b2f01b06dda5003c964f1065eda
+Off-Chain Factory address: 0x62c9b599ee126d73d2560ed3a0c2a80ace848a24

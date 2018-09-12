@@ -28,3 +28,4 @@ contract Owned {
         newOwner = address(0);
     }
 }
+
