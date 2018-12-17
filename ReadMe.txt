@@ -24,6 +24,6 @@ Simulation Guide
 6.	Copy and paste the private key from below .
 5b71e1378963fcad4bc96332c8e24fec37cb96a3b82a415c491f4804941fb52b
 7.	Direct to the directory of the source code in cmd command console: dAppStockSim2.2(Rinkeby) or dAppStockSim2.2(Ropsten).
-8.	In the console, type ¡§npm run dev¡¨
+8.	In the console, "type npm run dev"
 9.	Select the corresponding Ethereum network in meta mask that matches with the network of the system
 10.	Start the simulation.
